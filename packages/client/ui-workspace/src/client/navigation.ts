@@ -90,6 +90,11 @@ export interface UiWorkspace {
    */
   startSession(workspaceId?: WorkspaceId, options?: StartSessionOptions): void
   /**
+   * Open the Workspace browser's search over the visible content of every Session.
+   * The request reuses the Session search shortcut, so the browser expands its search field.
+   */
+  openSearch(): void
+  /**
    * Archive a Session and clear it when it is the current selection.
    * @param sessionId - Session to archive.
    * @param options - `stopActivity` asks the Host to stop the Session's running work instead of refusing.
@@ -191,6 +196,7 @@ class UiWorkspaceService extends Service implements UiWorkspace {
     private readonly sessions: ISessions,
     private readonly view: Pick<WorkspaceViewStoreActions, 'pinSessionOrder'>,
     private readonly notify: (toast: RowToast) => void,
+    private readonly requestSearch: () => void,
   ) {
     super(ctx, 'uiWorkspace')
     ctx.effect(() => {
@@ -332,6 +338,11 @@ class UiWorkspaceService extends Service implements UiWorkspace {
       ...onCreated === undefined ? {} : { onCreated },
       ...options?.allowMigration === undefined ? {} : { allowMigration: options.allowMigration },
     })
+  }
+
+  /** Request the Workspace browser's search field, which searches visible Session content across Sessions. */
+  openSearch(): void {
+    this.requestSearch()
   }
 
   startSession(workspaceId?: WorkspaceId, options?: StartSessionOptions): void {

@@ -21,7 +21,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import clsx from 'clsx'
 import {
-  FishLogo, IconAppsAddOutlineRegular, IconNewChatOutlineRegular, IconPlusOutlineMedium,
+  FishLogo, IconAppsAddOutlineRegular, IconNewChatOutlineRegular, IconPlusOutlineMedium, IconSearchOutlineRegular,
   IconPanelLeftOutlineRegular, IconPinFillRegular, focusWithoutRing, isBehindModal, isDarwinDesktop, Menu, ShortcutKeys, Toast,
   Tooltip, useModalLayer, writeClipboard,
 } from '@deepseek-ai/dsh-client-ui-primitives'
@@ -153,6 +153,7 @@ export function SidebarRoot({
   width,
   drawer,
   startSession,
+  openSearch,
   toggleSidebar,
   selectPanel,
   setPinned,
@@ -399,6 +400,13 @@ export function SidebarRoot({
             </span>}
           </button>
         </Tooltip>
+      )}
+
+      {wide && (
+        <button type="button" className={css.panelRow} aria-label={t('nav.search')} onClick={openSearch}>
+          <span className={css.panelGlyph} aria-hidden="true"><IconSearchOutlineRegular size={16} /></span>
+          <span className={clsx(css.panelTitle, css.wide)}>{t('nav.search')}</span>
+        </button>
       )}
 
       <div className={css.scrollRegion}>
