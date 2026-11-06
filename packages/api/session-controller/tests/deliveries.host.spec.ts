@@ -51,6 +51,14 @@ class DeliveryQuery extends SessionQueryEngine {
     return Promise.resolve(events.map(event => ({ sessionId, ...event }) as never))
   }
 
+  override searchSessions(): Promise<never> {
+    return Promise.reject(new Error('search is not configured in this test'))
+  }
+
+  override searchEvents(): Promise<never> {
+    return Promise.reject(new Error('event search is not configured in this test'))
+  }
+
   override readEvent(request: { sessionId: SessionId; seq: number }): Promise<never> {
     const event = (this.events.get(request.sessionId) ?? []).find(candidate => candidate.seq === request.seq)
     return Promise.resolve({ target: { data: event?.data } } as never)

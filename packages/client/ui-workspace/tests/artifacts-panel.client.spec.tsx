@@ -3,6 +3,7 @@ import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import { en as commonEn } from '@deepseek-ai/dsh-client-locale/src/locales/en.ts'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { ArtifactsListing, ArtifactsPanelProps } from '../src/client/contract/slots.ts'
 import { en } from '../src/client/locales.ts'
 import { ArtifactsPanel } from '../src/client/session-artifacts/ArtifactsPanel.tsx'
@@ -21,8 +22,8 @@ const items: ArtifactsListing = {
   ok: true,
   hasMore: false,
   items: [
-    { sessionId: 'sess-b', turn: 2, path: '/work/data.csv', time: 1_000 },
-    { sessionId: 'sess-a', turn: 1, path: '/work/report.md', description: 'Final report', time: 2_000 },
+    { sessionId: 'sess-b' as SessionId, turn: 2, path: '/work/data.csv', time: 1_000 },
+    { sessionId: 'sess-a' as SessionId, turn: 1, path: '/work/report.md', description: 'Final report', time: 2_000 },
   ],
 }
 
