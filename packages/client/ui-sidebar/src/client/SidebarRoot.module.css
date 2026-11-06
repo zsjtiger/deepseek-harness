@@ -417,55 +417,34 @@
 
 /* New Session: 38px bar, 12px radius (figma 133:7634 geometry, squared-off
    corners); collapsed it renders as the rail's plain icon control. */
+/* Wide New row: a navigation row like the panel rows below it, with no
+   border or elevated fill; the collapsed rail keeps its own overrides. */
 .newSession {
   container-type: inline-size;
   position: relative;
   flex: none;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0;
-  height: 38px;
-  padding: 8px 12px;
-  margin: 0 calc(var(--dsh-sidebar-paint-inset) + 1px);
+  justify-content: flex-start;
+  gap: var(--dsh-sidebar-label-gap);
+  min-height: 32px;
+  padding: 5px calc(var(--dsh-sidebar-row-padding) - var(--dsh-sidebar-paint-inset));
+  margin: 0 var(--dsh-sidebar-paint-inset);
   box-sizing: border-box;
-  border: 0.5px solid var(--dsw-alias-border-l3);
+  border: none;
   border-radius: var(--dsw-radius-md);
-  background: var(--dsw-alias-button-elevated-fill);
+  background: transparent;
   color: var(--dsw-alias-label-primary);
-  font-size: 14px;
-  font-weight: 500;
+  font: inherit;
   line-height: 22px;
+  text-align: left;
   cursor: pointer;
   overflow: hidden;
 }
 
 @media (hover: hover) {
   .newSession:hover {
-    background: var(--dsw-alias-button-floating-hover);
-  }
-}
-
-/* macOS: the themed elevated fill reads as a foreign slab on the vibrancy
-   sidebar; a white wash sits in the glass like native macOS sidebar
-   controls. Dark keeps the same white ink at lower alpha. */
-:global([data-platform='darwin']) :where(.root:not([role='dialog'])) .newSession {
-  background: rgb(255 255 255 / 0.55);
-}
-
-@media (hover: hover) {
-  :global([data-platform='darwin']) :where(.root:not([role='dialog'])) .newSession:hover {
-    background: rgb(255 255 255 / 0.3);
-  }
-}
-
-:global([data-platform='darwin']) :global([data-ds-dark-theme]) :where(.root:not([role='dialog'])) .newSession {
-  background: rgb(255 255 255 / 0.15);
-}
-
-@media (hover: hover) {
-  :global([data-platform='darwin']) :global([data-ds-dark-theme]) :where(.root:not([role='dialog'])) .newSession:hover {
-    background: rgb(255 255 255 / 0.2);
+    background: var(--dsw-alias-interactive-bg-hover);
   }
 }
 
@@ -509,7 +488,7 @@
     mask-image: linear-gradient(to right, black calc(100% - 16px), transparent);
   }
 }
-.newSessionContent { display: flex; width: 100cqw; align-items: center; justify-content: center; gap: 6px; }
+.newSessionContent { display: flex; width: 100cqw; align-items: center; justify-content: flex-start; gap: var(--dsh-sidebar-label-gap); }
 .newSessionContent > svg { flex: none; }
 
 .newSessionShortcut {
