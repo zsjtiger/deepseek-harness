@@ -7,7 +7,10 @@ import { isUserInvocable } from '@deepseek-ai/dsh-skill'
 import type {} from '@deepseek-ai/dsh-working-directory'
 import type { ScopeKey } from '@deepseek-ai/dsh-scope'
 import { Remote, RemoteError, TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol'
-import type { SkillListRequest, SkillListValue } from './types.ts'
+import { listUserSkills, removeUserSkill, uploadUserSkill } from './user-skills.ts'
+import type {
+  SkillListRequest, SkillListValue, UserSkillEntry, UserSkillListValue, UserSkillRemoveRequest, UserSkillUploadRequest,
+} from './types.ts'
 
 declare module '@deepseek-ai/cordis' {
   interface Context {
@@ -88,6 +91,37 @@ export class SessionSkillCatalog extends TypertRemoteService {
     } catch (error: unknown) {
       throw new RemoteError('gateway/internal', `skill listing failed: ${String(error)}`, {})
     }
+  }
+
+  /**
+   * List the user's own skills under `$DSH_HOME/skills`, for the Skills management page.
+   * @param signal - caller lifetime for the directory read.
+   * @returns the user's skills sorted by name.
+   */
+  @Remote
+  async listUser(signal: AbortSignal): Promise<UserSkillListValue> {
+    return listUserSkills(signal)
+  }
+
+  /**
+   * Store one uploaded SKILL.md as a user skill the user can invoke with `/name`.
+   * @param request - the uploaded SKILL.md text.
+   * @param signal - caller lifetime for the write.
+   * @returns the stored skill.
+   */
+  @Remote
+  async uploadUser(request: UserSkillUploadRequest, signal: AbortSignal): Promise<UserSkillEntry> {
+    return uploadUserSkill(request, signal)
+  }
+
+  /**
+   * Delete one of the user's own skills.
+   * @param request - the skill name.
+   * @param signal - caller lifetime for the removal.
+   */
+  @Remote
+  async removeUser(request: UserSkillRemoveRequest, signal: AbortSignal): Promise<void> {
+    return removeUserSkill(request, signal)
   }
 
   /** Resolve a live or standing preset scope without creating an Agent. */

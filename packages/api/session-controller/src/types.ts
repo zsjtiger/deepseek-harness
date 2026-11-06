@@ -740,3 +740,27 @@ export type SessionProjectionValue = JsonValue
 
 /** Application metadata returned by the serving desktop for one file. */
 export type SessionWorkspacePathApplication = NativeFileApplication
+
+/** One skill folder under the user skill root. */
+export interface UserSkillEntry {
+  readonly name: string
+  readonly description: string
+  /** False when the folder's SKILL.md is missing, malformed, or names a different skill. */
+  readonly valid: boolean
+}
+
+/** User-owned skills, sorted by name. */
+export interface UserSkillListValue {
+  readonly skills: readonly UserSkillEntry[]
+}
+
+/** Upload of one SKILL.md file. */
+export interface UserSkillUploadRequest {
+  /** Full SKILL.md text, with YAML frontmatter carrying `name` and `description`. */
+  readonly content: string
+}
+
+/** Removal of one user-owned skill folder. */
+export interface UserSkillRemoveRequest {
+  readonly name: string
+}

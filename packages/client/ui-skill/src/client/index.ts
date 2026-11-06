@@ -53,6 +53,7 @@ import { SkillReference, type SkillReferenceInjected } from './SkillReference.ts
 import { skillReferenceRule } from './user-text-rules.ts'
 export type {} from './user-text-rules.ts'
 import { en, ja, es, fr, de, ru, pt, NS, zh, type SkillKey } from './locales.ts'
+import { registerUserSkillsPanel } from './UserSkillsRegistration.tsx'
 
 declare module '@deepseek-ai/dsh-api-session-controller/client' {
   interface SessionReferenceSourceMap {
@@ -85,6 +86,7 @@ export const inject = ['inputTriggers', 'sessions', 'slots', 'locale', 'remote',
  */
 export function apply(ctx: ClientContext): void {
   ctx.effect(() => ctx.locale.register(NS, { zh, en, ja, es, fr, de, ru, pt }), 'ui-skill: dictionaries')
+  registerUserSkillsPanel(ctx)
   ctx.uiConversation.userText.register(skillReferenceRule)
   ctx.slots.inject('tool.call.toolview', () => ctx.slots.register(
     { name: 'tool.call.toolview', key: 'skill', locale: NS },

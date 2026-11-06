@@ -102,6 +102,9 @@ export const VIEWER_ENDPOINT_CLASSES = {
   'session/openWorkspacePath': 'owner-only', // owner opens a Workspace path
   'session/search': 'owner-only', // owner searches across Sessions
   'session/deliveries': 'owner-only', // owner lists files presented across Sessions
+  'skills/listUser': 'owner-only', // owner lists the skills in their user skill root
+  'skills/uploadUser': 'owner-only', // owner uploads a skill into their user skill root
+  'skills/removeUser': 'owner-only', // owner removes a skill from their user skill root
   'session/selectModel': 'owner-only', // owner selects a Session model
   'session/updateQueue': 'owner-only', // owner edits queued input
   'session/workspacePathApplications': 'owner-only', // owner applies a Workspace path
