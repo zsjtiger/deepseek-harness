@@ -19,7 +19,7 @@ import type { SessionReferenceSource } from '../index.ts'
 import { createScope, scopeIdentityOf, scopeOf as scopeTagOf } from '../scope.ts'
 import { SessionManager } from './manager.ts'
 import type { SessionRemotes } from './remotes.ts'
-import type { SessionListPhase, SessionSearchResultItem, SessionProjectionSnapshot } from './manager.ts'
+import type { SessionDeliveryItem, SessionListPhase, SessionSearchResultItem, SessionProjectionSnapshot } from './manager.ts'
 import type { Session } from './session.ts'
 import type { SessionListEntry } from './lineage.ts'
 
@@ -385,6 +385,17 @@ export class ClientSessions implements ISessions {
     signal: AbortSignal,
   ): Promise<RemoteResult<{ items: SessionSearchResultItem[]; hasMore: boolean }>> {
     return this.manager.search(query, signal)
+  }
+
+  /**
+   * List files presented in visible Sessions.
+   * @param signal - cancellation for a superseded listing.
+   * @returns bounded presented-file items, or a business/transport error.
+   */
+  deliveries(
+    signal: AbortSignal,
+  ): Promise<RemoteResult<{ items: SessionDeliveryItem[]; hasMore: boolean }>> {
+    return this.manager.deliveries(signal)
   }
 
   /**

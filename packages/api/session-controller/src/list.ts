@@ -12,17 +12,48 @@ import { SessionQueryError, type SessionRecord, type SessionSearchCursor } from 
 import { RemoteError } from '@deepseek-ai/dsh-typert-protocol'
 import { z } from 'zod'
 import {
+  DELIVERY_RESULT_LIMIT,
+  DELIVERY_SESSION_LIMIT,
   SESSION_SEARCH_RESULT_LIMIT,
   SESSION_SEARCH_SNIPPET_MAX_CODE_POINTS,
 } from './types.ts'
 import type {
-  SessionListMetadata, SessionProjectionHints, SessionSearchItem,
+  DeliveryItem, DeliveryValue, SessionListMetadata, SessionProjectionHints, SessionSearchItem,
   SessionSearchValue, SessionSummary,
 } from './types.ts'
 
 const SEARCH_PROVIDER_CALL_LIMIT = 100
 const SESSION_SEARCH_QUERY_MAX_CHARS = 500
 const MESSAGE_TYPES = new Set(['user/message', 'assistant/message'])
+/** Event type the deliverables tool writes; declared here as text because this package does not merge its event map. */
+const PRESENTED_EVENT_TYPE: string = 'deliverables/presented'
+
+/** One presented file read from a `deliverables/presented` payload. */
+interface PresentedFileRecord {
+  readonly turn: number
+  readonly path: string
+  readonly description?: string
+}
+
+/**
+ * Read presented files from durable payload data. Entries without a non-empty
+ * path are skipped, so a malformed record cannot break the listing.
+ * @param data - the payload of one `deliverables/presented` event.
+ * @returns the presented files with the payload's turn, or none when the payload is malformed.
+ */
+function presentedFiles(data: unknown): PresentedFileRecord[] {
+  if (typeof data !== 'object' || data === null || !('turn' in data) || !('files' in data)) return []
+  const { turn, files } = data
+  if (typeof turn !== 'number' || !Number.isSafeInteger(turn) || turn < 1 || !Array.isArray(files)) return []
+  const out: PresentedFileRecord[] = []
+  for (const file of files) {
+    if (typeof file !== 'object' || file === null || !('path' in file)) continue
+    const { path, description } = file
+    if (typeof path !== 'string' || path.length === 0) continue
+    out.push({ turn, path, ...(typeof description === 'string' ? { description } : {}) })
+  }
+  return out
+}
 
 const sessionListMetadataSchema: z.ZodType<SessionListMetadata> = z.object({
   blank: z.boolean(),
@@ -190,6 +221,69 @@ export class ApiSessionList {
       blank: metadata?.blank ?? false,
       ...listFields(header),
       ...(projections === undefined ? {} : { projections }),
+    }
+  }
+
+  /**
+   * List files that turns presented in visible Sessions, newest provider order first.
+   * Scans at most `DELIVERY_SESSION_LIMIT` Sessions and returns at most
+   * `DELIVERY_RESULT_LIMIT` files; `hasMore` reports either bound was reached.
+   * @param signal - cancellation for list and event reads.
+   * @returns bounded presented-file items.
+   */
+  async deliveries(signal: AbortSignal): Promise<DeliveryValue> {
+    signal.throwIfAborted()
+    const provider = this.ctx.get('sessionQuery')
+    if (provider === undefined) {
+      throw new RemoteError(
+        'gateway/internal',
+        'deliveries are unavailable: this deployment does not mount @deepseek-ai/dsh-session-query',
+        {},
+      )
+    }
+    try {
+      const visible = (await provider.listSessions(signal)).filter(record => record.header.cwd !== undefined)
+      signal.throwIfAborted()
+      const scanned = visible.slice(0, DELIVERY_SESSION_LIMIT)
+      let hasMore = visible.length > DELIVERY_SESSION_LIMIT
+      const items: DeliveryItem[] = []
+      for (const record of scanned) {
+        if (items.length >= DELIVERY_RESULT_LIMIT) {
+          hasMore = true
+          break
+        }
+        const sessionId = record.header.id
+        const events = await provider.listEvents(sessionId)
+        for (const event of events) {
+          signal.throwIfAborted()
+          if (event.type !== PRESENTED_EVENT_TYPE || event.surface !== 'current') continue
+          if (items.length >= DELIVERY_RESULT_LIMIT) {
+            hasMore = true
+            break
+          }
+          const window = await provider.readEvent({ sessionId, seq: event.seq }, signal)
+          for (const file of presentedFiles(window.target.data)) {
+            if (items.length >= DELIVERY_RESULT_LIMIT) {
+              hasMore = true
+              break
+            }
+            items.push({
+              sessionId,
+              turn: file.turn,
+              path: file.path,
+              ...(file.description === undefined ? {} : { description: file.description }),
+              time: event.time,
+            })
+          }
+        }
+      }
+      return { items, hasMore }
+    } catch (error: unknown) {
+      signal.throwIfAborted()
+      if (error instanceof SessionQueryError && error.code === 'SESSION_QUERY_ABORTED') {
+        throw new RemoteError('gateway/cancelled', 'delivery listing was aborted', {})
+      }
+      throw new RemoteError('gateway/internal', `delivery listing failed: ${String(error)}`, {})
     }
   }
 

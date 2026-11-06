@@ -43,7 +43,7 @@ import type {
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
-import type { SessionListState, SessionSearchResultItem } from '@deepseek-ai/dsh-api-session-controller/client'
+import type { SessionDeliveryItem, SessionListState, SessionSearchResultItem } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { RemoteHostFacts } from '@deepseek-ai/dsh-api-remotes/client'
 import type { SessionActivity, WorkspaceId, WorkspaceView } from '@deepseek-ai/dsh-api-workspace-controller/client'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
@@ -497,6 +497,29 @@ export interface SessionSearchPaletteInjected {
     signal: AbortSignal,
   ) => Promise<{ items: readonly SessionSearchResultItem[]; hasMore: boolean }>
 }
+
+/** Outcome of one presented-files listing: items with the Host's truncation flag, or a failure. */
+export type ArtifactsListing =
+  | { readonly ok: true; readonly items: readonly SessionDeliveryItem[]; readonly hasMore: boolean }
+  | { readonly ok: false }
+
+/** Injected data for the Artifacts main panel. */
+export interface ArtifactsPanelInjected {
+  hooks: {
+    /** Session list that supplies titles for each presented file. */
+    sessionList: HostObservable<SessionListState>
+  }
+  /** Read the Host listing of files presented in visible Sessions. */
+  loadDeliveries: (signal: AbortSignal) => Promise<ArtifactsListing>
+  /** Open the Session that presented a file. */
+  openSession: (sessionId: SessionId) => void
+}
+
+/** Props of the Artifacts main panel. */
+export type ArtifactsPanelProps =
+  PropsLocale<'workspace'>
+  & Omit<ArtifactsPanelInjected, 'hooks'>
+  & PropsHooks<ArtifactsPanelInjected['hooks']>
 
 /** Props of the Session search palette entry in `shell.overlay`. */
 export type SessionSearchPaletteProps =

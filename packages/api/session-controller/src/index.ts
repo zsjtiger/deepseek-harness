@@ -58,6 +58,7 @@ import type {
   SessionRenameValue,
   SessionSearchRequest,
   SessionSearchValue,
+  DeliveryValue,
   SessionSelectModelRequest,
   SessionSelectModelValue,
   SessionProjectionsRequest,
@@ -295,6 +296,17 @@ export class SessionController extends TypertRemoteService {
   @Remote('search')
   async search(request: SessionSearchRequest, signal: AbortSignal): Promise<SessionSearchValue> {
     const result = await this.listState.search(request.query, signal)
+    return { ...result, items: result.items.filter(item => this.ctx.remoteAccess.allows({ kind: 'session', id: item.sessionId })) }
+  }
+
+  /**
+   * List files that turns presented in Sessions the caller may access.
+   * @param signal - cancellation for the listing.
+   * @returns bounded presented-file items, filtered by Session access.
+   */
+  @Remote('deliveries')
+  async deliveries(signal: AbortSignal): Promise<DeliveryValue> {
+    const result = await this.listState.deliveries(signal)
     return { ...result, items: result.items.filter(item => this.ctx.remoteAccess.allows({ kind: 'session', id: item.sessionId })) }
   }
 

@@ -164,6 +164,7 @@ class FakeSessions implements ISessions {
   declare readonly searchResultLimit: ISessions['searchResultLimit']
   declare readonly refresh: ISessions['refresh']
   declare readonly search: ISessions['search']
+  declare readonly deliveries: ISessions['deliveries']
   declare readonly scope: ISessions['scope']
   declare readonly scopeOf: ISessions['scopeOf']
   declare readonly sessionOf: ISessions['sessionOf']

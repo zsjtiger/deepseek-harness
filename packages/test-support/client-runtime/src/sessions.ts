@@ -311,7 +311,7 @@ export class TestSessions implements ISessions {
 
   /** Calls observed on the service-level face, newest last. */
   readonly calls: {
-    method: 'create' | 'refreshProjections' | 'refresh' | 'search' | 'fork'
+    method: 'create' | 'refreshProjections' | 'refresh' | 'search' | 'deliveries' | 'fork'
     args: unknown[]
   }[] = []
 
@@ -669,6 +669,16 @@ export class TestSessions implements ISessions {
   search(query: string, signal: AbortSignal): ReturnType<ISessions['search']> {
     this.calls.push({ method: 'search', args: [query, signal] })
     return Promise.resolve({ ok: true, value: this.searchStub?.(query, signal) ?? { items: [], hasMore: false } })
+  }
+
+  /**
+   * Empty delivery listing; the Artifacts surface reads the Host listing in production.
+   * @param signal - cancellation for a superseded listing.
+   * @returns an empty bounded listing.
+   */
+  deliveries(signal: AbortSignal): ReturnType<ISessions['deliveries']> {
+    this.calls.push({ method: 'deliveries', args: [signal] })
+    return Promise.resolve({ ok: true, value: { items: [], hasMore: false } })
   }
 
   /**

@@ -10,7 +10,7 @@ import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { WorkspaceId } from '@deepseek-ai/dsh-workspace/types'
 import type { RemoteResult } from '@deepseek-ai/dsh-typert-protocol'
 import type { AgentContext } from '../scope.ts'
-import type { SessionSearchResultItem } from '../sessions/manager.ts'
+import type { SessionDeliveryItem, SessionSearchResultItem } from '../sessions/manager.ts'
 import type { SessionBinding, SessionListState } from '../sessions/service.ts'
 import type { SessionFace } from './session.ts'
 import type { ObservableSnapshot } from '@deepseek-ai/dsh-client-store'
@@ -121,6 +121,15 @@ export interface ISessions {
     query: string,
     signal: AbortSignal,
   ): Promise<RemoteResult<{ items: SessionSearchResultItem[]; hasMore: boolean }>>
+  /**
+   * List files that turns presented in visible Sessions, newest first, bounded
+   * by the Host. Results are request-local and do not change the list snapshot.
+   * @param signal - cancellation for a superseded listing.
+   * @returns bounded presented-file items, or a business/transport error.
+   */
+  deliveries(
+    signal: AbortSignal,
+  ): Promise<RemoteResult<{ items: SessionDeliveryItem[]; hasMore: boolean }>>
   /**
    * Fork a session from an exact inclusive prefix of the source; on
    * resolution the child is catalogued and can be explicitly retained.

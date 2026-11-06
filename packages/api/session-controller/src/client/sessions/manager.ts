@@ -47,6 +47,16 @@ export interface SessionSearchResultItem {
   snippet: string
 }
 
+/** One file a turn presented, with the Session and turn that delivered it. */
+export interface SessionDeliveryItem {
+  sessionId: SessionId
+  turn: number
+  path: string
+  description?: string
+  /** Epoch milliseconds of the delivering event. */
+  time: number
+}
+
 /** Immutable session-list snapshot for useSessionList. */
 export interface SessionListSnapshot {
   items: readonly SessionListEntry[]
@@ -456,6 +466,25 @@ export class SessionManager {
       }
     })()
     return this.listInflight
+  }
+
+  /**
+   * List files presented in visible Sessions for the Artifacts surface.
+   * @param signal - cancellation for a superseded listing.
+   * @returns the bounded Host listing, or a folded transport error.
+   */
+  async deliveries(
+    signal: AbortSignal,
+  ): Promise<RemoteResult<{ items: SessionDeliveryItem[]; hasMore: boolean }>> {
+    const result = await this.remote.session.deliveries(signal)
+    if (!result.ok) return result
+    return {
+      ok: true,
+      value: {
+        items: [...result.value.items],
+        hasMore: result.value.hasMore,
+      },
+    }
   }
 
   /**

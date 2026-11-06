@@ -264,6 +264,28 @@ export interface SessionSearchValue {
   readonly hasMore: boolean
 }
 
+/** One file a turn presented, with the Session and turn that delivered it. */
+export interface DeliveryItem {
+  readonly sessionId: SessionId
+  readonly turn: number
+  readonly path: string
+  readonly description?: string
+  /** Epoch milliseconds of the `deliverables/presented` event. */
+  readonly time: number
+}
+
+/** Bounded list of presented files across visible Sessions. */
+export interface DeliveryValue {
+  readonly items: readonly DeliveryItem[]
+  readonly hasMore: boolean
+}
+
+/** Maximum presented files returned by one delivery listing. */
+export const DELIVERY_RESULT_LIMIT = 100
+
+/** Maximum Sessions scanned by one delivery listing, newest provider order first. */
+export const DELIVERY_SESSION_LIMIT = 50
+
 /** Request for a Session for a new conversation. */
 export interface SessionCreateRequest {
   /** Workspace the Session joins; exclusive with `cwd`. */

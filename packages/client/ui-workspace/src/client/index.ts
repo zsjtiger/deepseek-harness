@@ -36,7 +36,7 @@ import type {} from '@deepseek-ai/dsh-api-workspace-controller/client'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 // Type-only: pulls the SlotRegistry service merge (ctx.slots).
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
-import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
+import type { MainPanelId } from '@deepseek-ai/dsh-client-ui-layout/client'
 // Type-only: pulls the Session root standard-hook merge.
 import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import {
@@ -44,6 +44,7 @@ import {
   type SessionArchiveConfirmInjected, type SessionArchiveConfirmRequest,
   type RenameSessionInjected, type RowToast, type RowToastInjected, type RowToastState, type SessionRenameDialogInjected,
   type SessionSearchPaletteInjected,
+  type ArtifactsListing, type ArtifactsPanelInjected,
   type WorkspaceActionRequest, type SessionIdInjected, type WorkspaceBrowserInjected, type WorkspacePickerInjected,
 } from './contract/slots.ts'
 import { createWorkspaceShortcutControls, installWorkspaceShortcuts } from './shortcuts.ts'
@@ -56,6 +57,7 @@ import { registerSessionMenus } from './session-actions/context-menus.tsx'
 import { PinSessionRowButton } from './session-actions/PinSession.tsx'
 import { SessionRenameDialog } from './session-actions/RenameSession.tsx'
 import { SessionSearchPalette } from './session-search/SessionSearchPalette.tsx'
+import { ArtifactsPanel, ArtifactsPanelIcon } from './session-artifacts/ArtifactsPanel.tsx'
 import { RowActionToast } from './session-actions/RowActionToast.tsx'
 import { registerToasts } from './toast/register.ts'
 import { WorkspacePicker } from './WorkspacePicker.tsx'
@@ -244,6 +246,17 @@ export function apply(ctx: Context): void {
     },
   })
   const renameInjected = (): RenameSessionInjected => ({ requestSessionRename })
+  // Stable listing function: the panel re-reads only when its mount changes.
+  const loadArtifacts = async (signal: AbortSignal): Promise<ArtifactsListing> => {
+    const result = await sessions.deliveries(signal)
+    return result.ok ? { ok: true, items: result.value.items, hasMore: result.value.hasMore } : { ok: false }
+  }
+  const artifactsInjected = (): ArtifactsPanelInjected => ({
+    hooks: { sessionList: sessions.list },
+    loadDeliveries: loadArtifacts,
+    openSession,
+  })
+  const ARTIFACTS_PANEL_ID = 'artifacts' as MainPanelId
   const paletteInjected = (): SessionSearchPaletteInjected => ({
     hooks: { paletteOpen: searchPalette, sessionList: sessions.list },
     close: () => { searchPalette.set(false) },
@@ -379,6 +392,13 @@ export function apply(ctx: Context): void {
       children: { 'workspace.toast': { kind: 'keyed', scope: 'root' } },
     }, RowActionToast)
   })
+  ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
+    name: 'sidebar.panellist', id: ARTIFACTS_PANEL_ID, order: 5, locale: NS,
+    label: () => ctx.locale.bind(NS)('artifacts.panel'),
+  }, ArtifactsPanelIcon))
+  ctx.slots.inject('main', () => ctx.slots.register({
+    name: 'main', key: ARTIFACTS_PANEL_ID, locale: NS, inject: artifactsInjected,
+  }, ArtifactsPanel))
   ctx.slots.inject('conversation.hero.workspace', () => ctx.slots.register(
     {
       name: 'conversation.hero.workspace',
