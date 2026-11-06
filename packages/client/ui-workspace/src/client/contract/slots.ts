@@ -43,7 +43,7 @@ import type {
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
-import type { SessionSearchResultItem } from '@deepseek-ai/dsh-api-session-controller/client'
+import type { SessionListState, SessionSearchResultItem } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { RemoteHostFacts } from '@deepseek-ai/dsh-api-remotes/client'
 import type { SessionActivity, WorkspaceId, WorkspaceView } from '@deepseek-ai/dsh-api-workspace-controller/client'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
@@ -476,6 +476,34 @@ export type SessionRenameDialogProps =
   & PropsLocale<'workspace'>
   & Omit<SessionRenameDialogInjected, 'hooks'>
   & PropsHooks<SessionRenameDialogInjected['hooks']>
+
+/** Injected data for the Session search palette in `shell.overlay`. */
+export interface SessionSearchPaletteInjected {
+  hooks: {
+    /** Whether the palette is open. */
+    paletteOpen: HostObservable<boolean>
+    /** Session list that supplies Recents and result titles. */
+    sessionList: HostObservable<SessionListState>
+  }
+  /** Close the palette. */
+  close: () => void
+  /** Open a Session and close the palette. */
+  openSession: (sessionId: SessionId) => void
+  /** Start a New Session and close the palette. */
+  startSession: () => void
+  /** Content search over visible Session messages, the same request the Workspace browser sends. */
+  searchSessions: (
+    query: string,
+    signal: AbortSignal,
+  ) => Promise<{ items: readonly SessionSearchResultItem[]; hasMore: boolean }>
+}
+
+/** Props of the Session search palette entry in `shell.overlay`. */
+export type SessionSearchPaletteProps =
+  PropsRuntime<'shell.overlay'>
+  & PropsLocale<'workspace'>
+  & Omit<SessionSearchPaletteInjected, 'hooks'>
+  & PropsHooks<SessionSearchPaletteInjected['hooks']>
 
 /** Props of the stop-and-archive dialog entry in `shell.overlay`. */
 export type SessionArchiveConfirmProps =

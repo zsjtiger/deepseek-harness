@@ -43,6 +43,7 @@ import {
   type ArchiveSessionInjected, type ForkSessionInjected, menuOpenStateFactory, type PinSessionInjected,
   type SessionArchiveConfirmInjected, type SessionArchiveConfirmRequest,
   type RenameSessionInjected, type RowToast, type RowToastInjected, type RowToastState, type SessionRenameDialogInjected,
+  type SessionSearchPaletteInjected,
   type WorkspaceActionRequest, type SessionIdInjected, type WorkspaceBrowserInjected, type WorkspacePickerInjected,
 } from './contract/slots.ts'
 import { createWorkspaceShortcutControls, installWorkspaceShortcuts } from './shortcuts.ts'
@@ -54,6 +55,7 @@ import { derive } from './session-actions/derived.ts'
 import { registerSessionMenus } from './session-actions/context-menus.tsx'
 import { PinSessionRowButton } from './session-actions/PinSession.tsx'
 import { SessionRenameDialog } from './session-actions/RenameSession.tsx'
+import { SessionSearchPalette } from './session-search/SessionSearchPalette.tsx'
 import { RowActionToast } from './session-actions/RowActionToast.tsx'
 import { registerToasts } from './toast/register.ts'
 import { WorkspacePicker } from './WorkspacePicker.tsx'
@@ -123,8 +125,9 @@ export function apply(ctx: Context): void {
   let toastSeq = 0
   const notify = (toast: RowToast): void => { rowToast.set({ ...toast, seq: ++toastSeq }) }
   const shortcutControls = createWorkspaceShortcutControls()
+  const searchPalette = createSnapshotStore(false)
   const uiWorkspace = new UiWorkspaceService(
-    ctx, ctx.remote.directoryPicker, workspaces, sessions, viewInstance.actions, notify, shortcutControls.search,
+    ctx, ctx.remote.directoryPicker, workspaces, sessions, viewInstance.actions, notify, () => { searchPalette.set(true) },
   )
   ctx.slots.provideRoot({
     hooks: { workspaces: workspaces.list },
@@ -241,6 +244,19 @@ export function apply(ctx: Context): void {
     },
   })
   const renameInjected = (): RenameSessionInjected => ({ requestSessionRename })
+  const paletteInjected = (): SessionSearchPaletteInjected => ({
+    hooks: { paletteOpen: searchPalette, sessionList: sessions.list },
+    close: () => { searchPalette.set(false) },
+    openSession: (sessionId) => {
+      searchPalette.set(false)
+      openSession(sessionId)
+    },
+    startSession: () => {
+      searchPalette.set(false)
+      uiWorkspace.startSession()
+    },
+    searchSessions,
+  })
   const renameDialogInjected = (): SessionRenameDialogInjected => ({
     hooks: { renameRequest },
     settleSessionRename: shortcutControls.closeRename,
@@ -355,6 +371,9 @@ export function apply(ctx: Context): void {
     yield ctx.slots.register({
       name: 'shell.overlay', id: 'workspace.session-archive', locale: NS, inject: archiveConfirmInjected,
     }, SessionArchiveConfirmDialog)
+    yield ctx.slots.register({
+      name: 'shell.overlay', id: 'workspace.session-search', locale: NS, inject: paletteInjected,
+    }, SessionSearchPalette)
     yield ctx.slots.register({
       name: 'shell.overlay', id: 'workspace.row-toast', inject: rowToastInjected,
       children: { 'workspace.toast': { kind: 'keyed', scope: 'root' } },

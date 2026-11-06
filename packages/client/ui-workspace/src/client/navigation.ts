@@ -89,10 +89,7 @@ export interface UiWorkspace {
    * whether existing text or attachments are kept, replaced, or followed by the prompt.
    */
   startSession(workspaceId?: WorkspaceId, options?: StartSessionOptions): void
-  /**
-   * Open the Workspace browser's search over the visible content of every Session.
-   * The request reuses the Session search shortcut, so the browser expands its search field.
-   */
+  /** Open the full-screen Session search, which matches the visible content of every Session. */
   openSearch(): void
   /**
    * Archive a Session and clear it when it is the current selection.
@@ -196,7 +193,7 @@ class UiWorkspaceService extends Service implements UiWorkspace {
     private readonly sessions: ISessions,
     private readonly view: Pick<WorkspaceViewStoreActions, 'pinSessionOrder'>,
     private readonly notify: (toast: RowToast) => void,
-    private readonly requestSearch: () => void,
+    private readonly showSearchPalette: () => void,
   ) {
     super(ctx, 'uiWorkspace')
     ctx.effect(() => {
@@ -340,9 +337,9 @@ class UiWorkspaceService extends Service implements UiWorkspace {
     })
   }
 
-  /** Request the Workspace browser's search field, which searches visible Session content across Sessions. */
+  /** Open the full-screen Session search. */
   openSearch(): void {
-    this.requestSearch()
+    this.showSearchPalette()
   }
 
   startSession(workspaceId?: WorkspaceId, options?: StartSessionOptions): void {
