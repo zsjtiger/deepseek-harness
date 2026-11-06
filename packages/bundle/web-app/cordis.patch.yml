@@ -258,6 +258,9 @@
     - id: ui-theme
       name: '@deepseek-ai/dsh-client-ui-theme'
 
+    - id: ui-theme-warm
+      name: '@deepseek-ai/dsh-client-ui-theme-warm'
+
     - id: locale
       name: '@deepseek-ai/dsh-client-locale'
 

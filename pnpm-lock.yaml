@@ -3161,6 +3161,9 @@ importers:
       '@deepseek-ai/dsh-client-ui-theme':
         specifier: workspace:*
         version: link:../../client/ui-theme
+      '@deepseek-ai/dsh-client-ui-theme-warm':
+        specifier: workspace:*
+        version: link:../../client/ui-theme-warm
       '@deepseek-ai/dsh-client-ui-tool':
         specifier: workspace:*
         version: link:../../client/ui-tool
@@ -6793,6 +6796,15 @@ importers:
       react:
         specifier: ^18.2.0
         version: 18.3.1
+
+  packages/client/ui-theme-warm:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-client-ui-theme':
+        specifier: workspace:*
+        version: link:../ui-theme
 
   packages/client/ui-tool:
     devDependencies:
