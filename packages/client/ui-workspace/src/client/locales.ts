@@ -136,7 +136,7 @@ export const en = {
   'draft.workspaceRequired': 'Choose a workspace first.',
   'draft.initializationFailed': 'Could not fill the draft. Please try again shortly.',
   'group.ungrouped': 'Ungrouped',
-  'session.new': 'New Session',
+  'session.new': 'New',
   'session.untitled': 'Untitled',
   'shortcut.noSession': 'Select a session first',
   'shortcut.noPicker': 'Directory picker unavailable',

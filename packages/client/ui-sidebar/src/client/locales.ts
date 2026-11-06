@@ -21,7 +21,7 @@ export type SidebarKey = keyof typeof zh
 export const en = {
   'panels.unpinTooltip': 'Unpin from left sidebar',
   'panels.unpin': 'Unpin {name} from sidebar',
-  'session.new': 'New Session',
+  'session.new': 'New',
   'session.new.label': 'New session',
   'toggle.open': 'Open sidebar',
   'toggle.collapse': 'Collapse sidebar',
