@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "sandbox-container",
+    "description": "Песочница процессов на контейнерах, ограничивающая команды в Docker."
+  }
+}

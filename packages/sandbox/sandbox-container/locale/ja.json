@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "sandbox-container",
+    "description": "Docker コンテナでコマンドを制限するプロセスサンドボックスです。"
+  }
+}

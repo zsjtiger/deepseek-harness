@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "sandbox-container",
+    "description": "容器进程沙箱，在 Docker 容器中限制命令。"
+  }
+}

@@ -189,7 +189,7 @@ function Palette({ useSessionList, close, openSession, startSession, searchSessi
       </div>
 
       <div className={css.footer}>
-        <kbd className={css.kbd}>Esc</kbd>
+        <kbd className={css.kbd}>{t('palette.escape')}</kbd>
         <span>{t('palette.footer.close')}</span>
       </div>
     </div>

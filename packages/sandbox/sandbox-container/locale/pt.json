@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "sandbox-container",
+    "description": "Sandbox de processos em contêineres que restringe comandos no Docker."
+  }
+}

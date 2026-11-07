@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "sandbox-container",
+    "description": "Bac à sable de processus en conteneur qui limite les commandes dans Docker."
+  }
+}
