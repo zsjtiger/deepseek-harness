@@ -174,6 +174,7 @@ export function ConversationContent(props: ConversationContentProps) {
       {hero && <HeroShell t={t} renderSlot={renderSlot} headline={props.headline} />}
       {zone !== undefined && renderSlot('conversation.input.dock', zone)}
       {inputBar}
+      {hero && renderSlot('conversation.hero.recent', {})}
     </div>
   )
 

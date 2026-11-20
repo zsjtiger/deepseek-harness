@@ -49,7 +49,7 @@ import {
   type SessionArchiveConfirmInjected, type SessionArchiveConfirmRequest,
   type RenameSessionInjected, type RowToast, type RowToastInjected, type RowToastState, type SessionRenameDialogInjected,
   type SessionSearchPaletteInjected,
-  type ArtifactsListing, type ArtifactsPanelInjected,
+  type ArtifactsListing, type ArtifactsPanelInjected, type RecentArtifactsInjected,
   type WorkspaceActionRequest, type SessionIdInjected, type WorkspaceBrowserInjected, type WorkspacePickerInjected,
 } from './contract/slots.ts'
 import { createWorkspaceShortcutControls, installWorkspaceShortcuts } from './shortcuts.ts'
@@ -63,6 +63,7 @@ import { PinSessionRowButton } from './session-actions/PinSession.tsx'
 import { SessionRenameDialog } from './session-actions/RenameSession.tsx'
 import { SessionSearchPalette } from './session-search/SessionSearchPalette.tsx'
 import { ArtifactsPanel, ArtifactsPanelIcon } from './session-artifacts/ArtifactsPanel.tsx'
+import { RecentArtifacts } from './session-artifacts/RecentArtifacts.tsx'
 import { RowActionToast } from './session-actions/RowActionToast.tsx'
 import { registerToasts } from './toast/register.ts'
 import { WorkspacePicker, WorkspacePickerFactory } from './WorkspacePicker.tsx'
@@ -461,6 +462,14 @@ export function apply(ctx: Context, config: SyncedConfig<WorkspaceNavigationConf
   ctx.slots.inject('main', () => ctx.slots.register({
     name: 'main', key: ARTIFACTS_PANEL_ID, locale: NS, inject: artifactsInjected,
   }, ArtifactsPanel))
+  const recentArtifactsInjected = (): RecentArtifactsInjected => ({
+    loadDeliveries: loadArtifacts,
+    openArtifacts: () => { ctx.layout.selectPanel(ARTIFACTS_PANEL_ID) },
+    openSession,
+  })
+  ctx.slots.inject('conversation.hero.recent', () => ctx.slots.register({
+    name: 'conversation.hero.recent', locale: NS, inject: recentArtifactsInjected,
+  }, RecentArtifacts))
   ctx.slots.inject('conversation.hero.workspace', () => ctx.slots.register(
     {
       name: 'conversation.hero.workspace',

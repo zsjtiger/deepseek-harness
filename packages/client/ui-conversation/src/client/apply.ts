@@ -354,6 +354,7 @@ export function apply(ctx: Context, config: SyncedConfig<ConversationConfig>): v
       'conversation.hero.workspace': { kind: 'single', scope: 'root' },
       'conversation.hero.agentPreset': { kind: 'single', scope: 'session-maybe' },
       'conversation.hero.options': { kind: 'list', scope: 'session' },
+      'conversation.hero.recent': { kind: 'single', scope: 'root' },
     },
     slots: {
       views: { scope: 'session' },

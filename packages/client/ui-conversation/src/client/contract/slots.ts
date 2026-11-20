@@ -298,6 +298,8 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
     'conversation.hero.agentPreset': { kind: 'single'; scope: 'session-maybe'; owner: HeroAgentPresetOwnerProps }
     /** Compact options right-aligned in the New Session row after the workspace and preset controls; rendered only with a Session. */
     'conversation.hero.options': { kind: 'list'; scope: 'session' }
+    /** Content below the blank-session composer, such as recent artifacts; rendered only in the hero phase. */
+    'conversation.hero.recent': { kind: 'single'; scope: 'root' }
     /**
      * Full-width entries above the composer card; fixed overlays must portal to the document body
      * because the docked composer contains them.
@@ -377,6 +379,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
         'conversation.hero.workspace': { kind: 'single'; scope: 'root' }
         'conversation.hero.agentPreset': { kind: 'single'; scope: 'session-maybe' }
         'conversation.hero.options': { kind: 'list'; scope: 'session' }
+        'conversation.hero.recent': { kind: 'single'; scope: 'root' }
       }
       inject: ConversationInjected
       locale: 'conversation'

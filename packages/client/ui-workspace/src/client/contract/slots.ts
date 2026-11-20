@@ -550,6 +550,19 @@ export interface ArtifactsPanelInjected {
 export type ArtifactsPanelProps =
   PropsLocale<'workspace'>
   & Omit<ArtifactsPanelInjected, 'hooks'>
+
+/** Injected data for the recent-artifacts strip below the blank-session composer. */
+export interface RecentArtifactsInjected {
+  /** Read the Host listing of files presented in visible Sessions. */
+  loadDeliveries: (signal: AbortSignal) => Promise<ArtifactsListing>
+  /** Open the Artifacts main panel. */
+  openArtifacts: () => void
+  /** Open the Session that presented a file. */
+  openSession: (sessionId: SessionId) => void
+}
+
+/** Props of the recent-artifacts strip. */
+export type RecentArtifactsProps = PropsLocale<'workspace'> & RecentArtifactsInjected
   & PropsHooks<ArtifactsPanelInjected['hooks']>
 
 /** Props of the Session search palette entry in `shell.overlay`. */
