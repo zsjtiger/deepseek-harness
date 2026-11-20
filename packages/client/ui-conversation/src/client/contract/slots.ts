@@ -580,6 +580,8 @@ export interface ComposerBarOwnerProps {
   placeholder?: string
   /** Optional content rendered above the composer surface. */
   accessory?: ReactNode
+  /** Optional content rendered in the bottom toolbar after the commands button. */
+  toolbarLeading?: ReactNode
 }
 
 /** One composer's entry in the document-level paste route. */

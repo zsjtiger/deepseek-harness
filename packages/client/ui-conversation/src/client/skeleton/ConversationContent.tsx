@@ -144,15 +144,16 @@ export function ConversationContent(props: ConversationContentProps) {
   // one disabled textarea, never a second tree. The no-workspace state wins
   // when both hold — picking a workspace is the earlier prerequisite.
   const blocked = !inert && composerBlock !== undefined
-  // The hero workspace row sits inside the input card, above the textarea. Its
-  // clicks stop here so the chip does not also trigger the whole-card picker.
-  const heroAccessory = hero
+  // The hero workspace row sits in the input card's bottom toolbar, after the
+  // commands button. Its clicks stop here so the chip does not also trigger the
+  // whole-card picker.
+  const heroToolbarLeading = hero
     ? <div onClick={(event) => { event.stopPropagation() }}>{heroWorkspaceRow}</div>
     : undefined
   const inputBar = renderSlot('conversation.composer.bar', {
     variant: hero ? 'hero' : 'composer',
     occurrence: props.variant,
-    accessory: heroAccessory,
+    toolbarLeading: heroToolbarLeading,
     ...(inert
       ? {
         disabled: true,
