@@ -222,7 +222,9 @@ export class ApiSessionList {
         const events = await provider.listEvents(sessionId)
         for (const event of events) {
           signal.throwIfAborted()
-          if (event.type !== PRESENTED_EVENT_TYPE || event.surface !== 'current') continue
+          // Presented files are log-only UI facts: the model-visible 'current' surface never
+          // holds them, so only replaced ('shadowed') events are excluded.
+          if (event.type !== PRESENTED_EVENT_TYPE || event.surface === 'shadowed') continue
           if (items.length >= DELIVERY_RESULT_LIMIT) {
             hasMore = true
             break

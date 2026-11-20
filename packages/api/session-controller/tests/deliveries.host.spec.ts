@@ -19,7 +19,7 @@ const sid = (value: string): SessionId => value as SessionId
 interface FakeEvent {
   readonly seq: number
   readonly type: string
-  readonly surface: 'current' | 'fork'
+  readonly surface: 'current' | 'log-only' | 'shadowed'
   readonly time: number
   readonly data: unknown
 }
@@ -86,12 +86,12 @@ describe('session.deliveries', () => {
     new DeliveryQuery(ctx, [header('a', '/a'), header('hidden', null)], new Map([
       ['a', [
         { seq: 1, type: 'user/message', surface: 'current', time: 10, data: {} },
-        { seq: 2, type: 'deliverables/presented', surface: 'current', time: 20, data: presented(1, [
+        { seq: 2, type: 'deliverables/presented', surface: 'log-only', time: 20, data: presented(1, [
           { path: '/a/report.md', description: 'Report' },
           { path: '' },
         ]) },
         { seq: 3, type: 'deliverables/presented', surface: 'current', time: 30, data: { turn: 'bad' } },
-        { seq: 4, type: 'deliverables/presented', surface: 'fork', time: 40, data: presented(2, [{ path: '/a/forked.md' }]) },
+        { seq: 4, type: 'deliverables/presented', surface: 'shadowed', time: 40, data: presented(2, [{ path: '/a/forked.md' }]) },
       ]],
       ['hidden', [
         { seq: 1, type: 'deliverables/presented', surface: 'current', time: 50, data: presented(1, [{ path: '/hidden/x.md' }]) },
