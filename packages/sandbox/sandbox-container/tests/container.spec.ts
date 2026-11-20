@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { promisify } from 'node:util'
 import { Context } from '@deepseek-ai/cordis'
-import { SandboxUnavailableError, SandboxUnsupportedPolicyError } from '@deepseek-ai/dsh-sandbox'
+import { SandboxInvalidRootError, SandboxUnavailableError } from '@deepseek-ai/dsh-sandbox'
 import { describe, expect, it } from 'vitest'
 import { ContainerSandboxProvider, containerRunArgs } from '../src/index.ts'
 
@@ -54,7 +54,7 @@ describe('ContainerSandboxProvider', () => {
       const provider = new ContainerSandboxProvider(new Context(), config)
       await expect(provider.confine(['true'], {
         mode: 'workspace-write', workspaceRoot: dir, additionalWritableRoots: [link],
-      })).rejects.toBeInstanceOf(SandboxUnsupportedPolicyError)
+      })).rejects.toBeInstanceOf(SandboxInvalidRootError)
     } finally {
       rmSync(dir, { recursive: true, force: true })
     }

@@ -10,7 +10,7 @@ import { promisify } from 'node:util'
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
 import {
-  SandboxProvider, SandboxUnavailableError, SandboxUnsupportedPolicyError, canonicalPath,
+  SandboxProvider, SandboxUnavailableError, SandboxInvalidRootError, canonicalPath,
 } from '@deepseek-ai/dsh-sandbox'
 import type { ConfinedArgv, ConfinedSandboxMode, RunnerFailureRule, SandboxPolicy } from '@deepseek-ai/dsh-sandbox'
 
@@ -93,17 +93,17 @@ function hostUser(): string | undefined {
  * mount would bind the link's target, which the policy did not name.
  * @param path - the configured extra root as given.
  * @returns the canonical path.
- * @throws SandboxUnsupportedPolicyError when the entry is missing, not a directory, or a symlink.
+ * @throws SandboxInvalidRootError when the entry is missing, not a directory, or a symlink.
  */
 function extraWritableRoot(path: string): string {
   let entry
   try {
     entry = lstatSync(path)
   } catch (_error: unknown) {
-    throw new SandboxUnsupportedPolicyError(`extra writable root "${path}" does not exist`)
+    throw new SandboxInvalidRootError(path, 'does not exist')
   }
-  if (entry.isSymbolicLink()) throw new SandboxUnsupportedPolicyError(`extra writable root "${path}" is a symbolic link`)
-  if (!entry.isDirectory()) throw new SandboxUnsupportedPolicyError(`extra writable root "${path}" is not a directory`)
+  if (entry.isSymbolicLink()) throw new SandboxInvalidRootError(path, 'is a symbolic link')
+  if (!entry.isDirectory()) throw new SandboxInvalidRootError(path, 'is not a directory')
   return canonicalPath(path)
 }
 
@@ -136,7 +136,7 @@ export class ContainerSandboxProvider extends SandboxProvider {
    * @param signal - cancellation for the daemon probe.
    * @returns the docker argv to spawn, with full enforcement and the Docker denial and failure dialect.
    * @throws SandboxUnavailableError when the Docker daemon cannot be reached.
-   * @throws SandboxUnsupportedPolicyError when an extra writable root is missing, a symlink, or not a directory.
+   * @throws SandboxInvalidRootError when an extra writable root is missing, a symlink, or not a directory.
    */
   async confine(argv: readonly string[], policy: SandboxPolicy, signal?: AbortSignal): Promise<ConfinedArgv> {
     signal?.throwIfAborted()
