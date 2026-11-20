@@ -144,9 +144,15 @@ export function ConversationContent(props: ConversationContentProps) {
   // one disabled textarea, never a second tree. The no-workspace state wins
   // when both hold — picking a workspace is the earlier prerequisite.
   const blocked = !inert && composerBlock !== undefined
+  // The hero workspace row sits inside the input card, above the textarea. Its
+  // clicks stop here so the chip does not also trigger the whole-card picker.
+  const heroAccessory = hero
+    ? <div onClick={(event) => { event.stopPropagation() }}>{heroWorkspaceRow}</div>
+    : undefined
   const inputBar = renderSlot('conversation.composer.bar', {
     variant: hero ? 'hero' : 'composer',
     occurrence: props.variant,
+    accessory: heroAccessory,
     ...(inert
       ? {
         disabled: true,
@@ -165,7 +171,6 @@ export function ConversationContent(props: ConversationContentProps) {
   const composerBar = (
     <div className={clsx(css.composerStack, hero && css.composerHero)}>
       {hero && <HeroShell t={t} renderSlot={renderSlot} headline={props.headline} />}
-      {hero && heroWorkspaceRow}
       {zone !== undefined && renderSlot('conversation.input.dock', zone)}
       {inputBar}
     </div>
