@@ -550,6 +550,7 @@ export interface ArtifactsPanelInjected {
 export type ArtifactsPanelProps =
   PropsLocale<'workspace'>
   & Omit<ArtifactsPanelInjected, 'hooks'>
+  & PropsHooks<ArtifactsPanelInjected['hooks']>
 
 /** Injected data for the recent-artifacts strip below the blank-session composer. */
 export interface RecentArtifactsInjected {
@@ -563,7 +564,6 @@ export interface RecentArtifactsInjected {
 
 /** Props of the recent-artifacts strip. */
 export type RecentArtifactsProps = PropsLocale<'workspace'> & RecentArtifactsInjected
-  & PropsHooks<ArtifactsPanelInjected['hooks']>
 
 /** Props of the Session search palette entry in `shell.overlay`. */
 export type SessionSearchPaletteProps =
